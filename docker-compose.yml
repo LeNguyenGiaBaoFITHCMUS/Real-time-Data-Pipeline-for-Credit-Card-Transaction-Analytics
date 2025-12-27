@@ -64,6 +64,8 @@ services:
       - "7077:7077"
     environment:
       - SPARK_MODE=master
+    # Ép Spark Master chạy class Java cụ thể, không bị exit
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip 0.0.0.0 --port 7077 --webui-port 8080
     volumes:
       - ./apps:/opt/spark/apps
     networks:
@@ -78,6 +80,8 @@ services:
       - SPARK_MASTER=spark://spark-master:7077
       - SPARK_WORKER_CORES=2
       - SPARK_WORKER_MEMORY=1G
+    # Ép Spark Worker kết nối tới Master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     volumes:
       - ./apps:/opt/spark/apps
     networks:
@@ -89,6 +93,7 @@ services:
     container_name: airflow
     ports:
       - "8085:8080"
+    user: root
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
